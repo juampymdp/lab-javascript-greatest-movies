@@ -1,25 +1,105 @@
-// Iteration 1: All directors? - Get the array of all directors.
-// _Bonus_: It seems some of the directors had directed multiple movies so they will pop up multiple times in the array of directors.
-// How could you "clean" a bit this array and make it unified (without duplicates)?
-function getAllDirectors(moviesArray) {}
+// Function "getAllDirectors"
+// Returns a new array with all directors, no duplicates
+function getAllDirectors(movies) {
+  // Using Set to remove duplicates
+  return [...new Set(movies.map(movie => movie.director))];
+}
 
-// Iteration 2: Steven Spielberg. The best? - How many drama movies did STEVEN SPIELBERG direct?
-function howManyMovies(moviesArray) {}
+// Function "howManyMovies"
+// Returns the number of drama movies directed by Steven Spielberg
+function howManyMovies(movies) {
+  if (!movies.length) return 0;
+  return movies.filter(
+    movie => movie.director === 'Steven Spielberg' && movie.genre.includes('Drama')
+  ).length;
+}
 
-// Iteration 3: All scores average - Get the average of all scores with 2 decimals
-function scoresAverage(moviesArray) {}
+// Function "scoresAverage"
+// Returns the average score of all movies, rounded to 2 decimal places
+function scoresAverage(movies) {
+  if (movies.length === 0) return 0;
+  const totalScore = movies.reduce((sum, movie) => {
+    return sum + (movie.score || 0);
+  }, 0);
+  return parseFloat((totalScore / movies.length).toFixed(2));
+}
 
-// Iteration 4: Drama movies - Get the average of Drama Movies
-function dramaMoviesScore(moviesArray) {}
+// Function "dramaMoviesScore"
+// Returns the average score of all drama movies, rounded to 2 decimal places
+function dramaMoviesScore(movies) {
+  const dramaMovies = movies.filter(movie => movie.genre.includes('Drama'));
+  if (!dramaMovies.length) return 0;
+  return scoresAverage(dramaMovies);
+}
 
-// Iteration 5: Ordering by year - Order by year, ascending (in growing order)
-function orderByYear(moviesArray) {}
+// Function "orderByYear"
+// Returns a new array of movies sorted by year and title alphabetically
+function orderByYear(movies) {
+  // Creating a new array to avoid mutating the original one
+  return [...movies].sort((a, b) => {
+    if (a.year === b.year) {
+      return a.title.localeCompare(b.title);
+    }
+    return a.year - b.year;
+  });
+}
 
-// Iteration 6: Alphabetic Order - Order by title and print the first 20 titles
-function orderAlphabetically(moviesArray) {}
+// Function "orderAlphabetically"
+// Returns an array of the first 20 movie titles in alphabetical order
+function orderAlphabetically(movies) {
+  return movies
+    .map(movie => movie.title)
+    .sort((a, b) => a.localeCompare(b))
+    .slice(0, 20);
+}
 
-// BONUS - Iteration 7: Time Format - Turn duration of the movies from hours to minutes
-function turnHoursToMinutes(moviesArray) {}
+// Function "turnHoursToMinutes"
+// Converts the duration of movies from hours to minutes
+function turnHoursToMinutes(movies) {
+  return movies.map(movie => {
+    const duration = movie.duration;
+    let minutes = 0;
+    
+    if (duration.includes('h')) {
+      minutes += parseInt(duration.split('h')[0]) * 60;
+    }
+    if (duration.includes('min')) {
+      minutes += parseInt(duration.split(' ')[1].replace('min', ''));
+    }
 
-// BONUS - Iteration 8: Best yearly score average - Best yearly score average
-function bestYearAvg(moviesArray) {}
+    return {
+      ...movie,
+      duration: minutes,
+    };
+  });
+}
+
+// Function "bestYearAvg"
+// Returns the year with the highest average score
+function bestYearAvg(movies) {
+  if (movies.length === 0) return null;
+
+  const yearScores = {};
+
+  movies.forEach(movie => {
+    if (!yearScores[movie.year]) {
+      yearScores[movie.year] = [];
+    }
+    yearScores[movie.year].push(movie.score || 0);
+  });
+
+  let bestYear = null;
+  let bestAverage = 0;
+
+  for (let year in yearScores) {
+    const average = yearScores[year].reduce((sum, score) => sum + score, 0) / yearScores[year].length;
+    if (average > bestAverage) {
+      bestAverage = average;
+      bestYear = year;
+    } else if (average === bestAverage) {
+      bestYear = Math.min(bestYear, year);
+    }
+  }
+  
+  return `The best year was ${bestYear} with an average score of ${bestAverage}`;
+}
